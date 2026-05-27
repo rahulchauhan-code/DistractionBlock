@@ -157,7 +157,13 @@ export const FocusProvider = ({ children }) => {
   // --- 3. DYNAMIC FLASK API BASE URL CONSTRUCTOR ---
   const getApiUrl = (endpoint = '') => {
     const hostname = window.location.hostname || 'localhost';
-    return `http://${hostname}:5000/api/session${endpoint}`;
+    // Check if we are running in a local/development environment
+    const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.') || hostname.startsWith('10.');
+    if (isLocal) {
+      return `http://${hostname}:5000/api/session${endpoint}`;
+    }
+    // Deployed environment (e.g., Vercel) - use relative path to avoid CORS, HTTPS/Mixed Content, and Port issues
+    return `/api/session${endpoint}`;
   };
 
   // --- 4. CLOUD SYNC LOGIC (Flask local network database API) ---
